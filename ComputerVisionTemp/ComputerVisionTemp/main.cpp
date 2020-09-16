@@ -1,8 +1,3 @@
-/*
-*    GOAL:  Display only the GREEN channel of the apple image in W2
-*           Show both the original and the green channel
-*
-*/
 #include "opencv2/highgui/highgui.hpp"
 #include <iostream>
 using namespace cv;
@@ -13,6 +8,7 @@ int main( int argc, const char** argv ){
     return(0);
 }
 
+
 void sineRect_breakoutroom(){
     // Rectangular:  Full intensity inside a left and right boundary zero elsewhere
     // SineWave:     One full sine wave cycle
@@ -20,7 +16,7 @@ void sineRect_breakoutroom(){
     Mat m2(256, 256, CV_32FC1, Scalar(1,0,0));
     for (int i = 0; i < 256; i++){
         for (int j = 0; j < 256; j++){
-            m1.at<float>(i,j) = sin(j/255.*2*M_PI) * 0.25 + 0.25;
+            m1.at<float>(i,j) = sin(j/255.* 4 * M_PI) * 0.5;
         }
     }
     for (int i = 0; i < 256; i++){
@@ -34,7 +30,7 @@ void sineRect_breakoutroom(){
     }
     namedWindow("M1");
     imshow("M1", m1);
-    namedWindow("M2");
-    imshow("M2", m2);
+//    namedWindow("M2");
+//    imshow("M2", m2);
     waitKey(0);
 }
