@@ -270,7 +270,6 @@ void on_trackBar(int, void*){
         }
     }
     imshow("img", img);
-    
 }
 
 void PartB_4(){

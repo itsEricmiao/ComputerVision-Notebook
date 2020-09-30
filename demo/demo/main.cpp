@@ -3,38 +3,32 @@
 *           Show both the original and the green channel
 *
 */
+
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/highgui.hpp"
+
 #include <iostream>
+#include <vector>
 using namespace cv;
 using namespace std;
-void sineRect_breakoutroom();
+
 int main( int argc, const char** argv ){
-    sineRect_breakoutroom();
+//    Mat src(3,3,CV_8UC1, [[1,2,3], [1,2,3], [1,2,3]]);
+//    Mat src_gray;
+    
+//    Mat dst;
+//    Laplacian(src, dst, CV_16S,3,1,0,BORDER_DEFAULT);
+    
+    vector<vector<uchar>> vec = {{1,2,3}, {1,2,3}, {1,2,3}};
+    Mat src( 3, 3, CV_8UC1, vec.data());
+    
+    cout<<src.rows<<endl;
+    for (int i = 0; i < src.rows; i++){
+        cout<<src.at<Vec3b>(i)<<endl;
+    }
+    cout<<"hello World"<<endl;
     return(0);
 }
 
-void sineRect_breakoutroom(){
-    // Rectangular:  Full intensity inside a left and right boundary zero elsewhere
-    // SineWave:     One full sine wave cycle
-    Mat m1(256, 256, CV_32FC1, Scalar(0,0,0));
-    Mat m2(256, 256, CV_32FC1, Scalar(1,0,0));
-    for (int i = 0; i < 256; i++){
-        for (int j = 0; j < 256; j++){
-            m1.at<float>(i,j) = sin(j/255.*2*M_PI) * 0.25 + 0.25;
-        }
-    }
-    for (int i = 0; i < 256; i++){
-        for (int j = 0; j < 256; j++){
-            if( j/256. < 0.3 || j/256. > 0.6){
-                m2.at<float>(i,j) = 0;
-            }else{
-                m2.at<float>(i,j) = 255;
-            }
-        }
-    }
-    namedWindow("M1");
-    imshow("M1", m1);
-    namedWindow("M2");
-    imshow("M2", m2);
-    waitKey(0);
-}
