@@ -16,44 +16,48 @@ string files[16]=
     "Cheetah.png","cat.jpg","einstein.bmp","motorcycle.bmp","tiger.jpg"
 };
 
+char input;
+
 // below are the variables for my sliders in ImageA
 const int MAX = 100;
-int sigma = 11;
+int sigma = 5;
 Mat image1;
 Mat image2;
 Mat hybrid_image;
 Mat low_freq_img;
 Mat high_freq_img;
 
-vector<Mat> read2Images();
+//Mat hybrid_image2;
 
-void process();
+
+vector<Mat> read2Images();
+Mat updateMag(Mat complex);
+
+
 void fftShift(Mat magI);
 void interface();
 void program1a();
 void program1b();
 void program2();
+void process();
+void process_B();
 static void on_trackbar( int, void* );
 
 Mat highPassFilter(Mat src, Mat filter);
 Mat computeDFT(Mat image);
-Mat process_B(Mat img);
 Mat computeIDFT(const cv::Mat &complexImage);
 
 
-int main()
-{
+int main(){
     interface();
     return 0;
 }
-
 
 vector<Mat> read2Images(){
     vector<Mat> vec;
     for(int i = 0; i < 15; i++){
         cout<<i+1<<": "<<files[i]<<endl;
     }
-    
     int option_img1;
     int option_img2;
     cout<<"Image 1: ";
@@ -71,10 +75,10 @@ vector<Mat> read2Images(){
     }else{
         cout<<"Found "<<files[option_img1-1]<<" and "<<files[option_img2-1]<<"!"<<endl;
     }
+    
     vec.push_back(image1);
     vec.push_back(image2);
     return vec;
-    
 }
 
 
@@ -118,6 +122,12 @@ void program1a(){
     createTrackbar( "Blend", "Hybrid image", &sigma, MAX, on_trackbar );
     on_trackbar(sigma, 0 );
     waitKey(0);
+    if(input == 's'){
+        cout<<"saving image..."<<endl;
+        imwrite("hybrid", hybrid_image);
+    }
+    
+    
 }
 
 static void on_trackbar( int, void* )
@@ -125,6 +135,9 @@ static void on_trackbar( int, void* )
     process();
     imshow( "Hybrid image", hybrid_image );
 }
+
+
+
 
 void process(){
     Mat low_freq_img1;
@@ -146,7 +159,9 @@ void process(){
     hybrid_image.convertTo(hybrid_image, CV_8UC3);
     
     imshow("Low frequencies", low_freq_img1);
+    moveWindow("Low frequencies", 300, 0);
     imshow("High frequencies", high_freq_img2);
+    moveWindow("High frequencies", 600, 0);
 }
 
 
@@ -176,9 +191,17 @@ void program1b(){
     hybrid_image.convertTo(hybrid_image, CV_8UC3);
     
     imshow("Low frequencies", low_freq_img);
+    moveWindow("Low frequencies", 300, 0);
     imshow("High frequencies", high_freq_img);
+    moveWindow("High frequencies", 600, 0);
     imshow("Hybrid image", hybrid_image );
+    moveWindow("Hybrid image", 900, 0);
     waitKey(0);
+    if(input == 's'){
+        cout<<"saving image..."<<endl;
+        imwrite("hybrid", hybrid_image);
+    }
+    
 }
 
 
@@ -223,16 +246,70 @@ void program2(){
     
     cvtColor(image1, image1, COLOR_BGR2GRAY);
     cvtColor(image2, image2, COLOR_BGR2GRAY);
+
+    namedWindow("Hybrid image", WINDOW_AUTOSIZE);
+    process_B();
+    waitKey(0);
+    if(input == 's'){
+        cout<<"saving image..."<<endl;
+        imwrite("hybrid", hybrid_image);
+    }
     
-    Mat x = process_B(image1);
-    Mat y = process_B(image2);
-    Mat z = x + y;
-    Mat z2 = computeIDFT(x);
+}
+
+
+
+void process_B(){
+    int M = getOptimalDFTSize( image1.rows );
+    int N = getOptimalDFTSize( image1.cols );
     
-    imshow("image1 mag", x);
-    imshow("image2 mag", y);
-    imshow("image3", z2);
-    waitKey();
+    Mat padded;
+    copyMakeBorder(image1, padded, 0, M - image1.rows, 0, N - image1.cols, BORDER_CONSTANT, Scalar::all(0));
+    Mat planes[] = {Mat_<float>(padded), Mat::zeros(padded.size(), CV_32F)};
+    Mat complexImg;
+    merge(planes, 2, complexImg);
+    dft(complexImg, complexImg);
+    
+    Mat padded2;
+    copyMakeBorder(image2, padded2, 0, M - image2.rows, 0, N - image2.cols, BORDER_CONSTANT, Scalar::all(0));
+    Mat planes2[] = {Mat_<float>(padded2), Mat::zeros(padded2.size(), CV_32F)};
+    Mat complexImg2;
+    merge(planes2, 2, complexImg2);
+    dft(complexImg2, complexImg2);
+    
+    // maginitude function
+    split(complexImg, planes);
+    split(complexImg2, planes2);
+    
+    Mat ph;
+    Mat ph2;
+    Mat mag;
+    Mat mag2;
+    phase(planes[0], planes[1], ph);
+    magnitude(planes[0], planes[1], mag);
+    phase(planes2[0], planes2[1], ph2);
+    magnitude(planes2[0], planes2[1],mag2);
+    
+    Mat mat (ph.size(), CV_32FC2);
+    Mat mat2 (ph2.size(), CV_32FC2);
+    
+    // reconstruct mat is not a real image
+    for(int row = 0; row < mat.rows; row++){
+        for (int col = 0; col < mat.cols; col++){
+            mat.at<Vec2f>(row, col)[0] = mag.at<float>(row, col) * cos(ph2.at<float>(row, col));
+            mat.at<Vec2f>(row, col)[1] = mag.at<float>(row, col) * sin(ph2.at<float>(row, col));
+        }
+    }
+    
+    //idft function
+    hybrid_image = computeIDFT(mat);
+    imshow("Image-1", image1);
+    moveWindow("Image-1", 300, 0);
+    imshow("Image-2", image2);
+    moveWindow("Image-2", 600, 0);
+    imshow("Hybrid", hybrid_image);
+    moveWindow("Hybrid", 0, 0);
+
 }
 
 // Compute the Discrete fourier transform
@@ -242,14 +319,12 @@ Mat computeDFT(Mat image) {
     int n = getOptimalDFTSize( image.cols ); // on the border add zero values
     copyMakeBorder(image, padded, 0, m - image.rows, 0, n - image.cols, BORDER_CONSTANT, Scalar::all(0));
     Mat planes[] = {Mat_<float>(padded), Mat::zeros(padded.size(), CV_32F)};
-
     Mat complex;
     merge(planes, 2, complex);         // Add to the expanded another plane with zeros
-
     dft(complex, complex, DFT_COMPLEX_OUTPUT);  // fourier transform
-
     return complex;
 }
+
 
 // Compute the inverse of the Fourier Transform
 Mat computeIDFT(const cv::Mat &complexImage) {
@@ -285,64 +360,5 @@ void fftShift(Mat magI) {
 
 
 
-Mat process_B(Mat input){
-    Mat img = input.clone();
-    // The DFT takes a REAL image and returns a COMPLEX image
-    int M = getOptimalDFTSize( img.rows );
-    int N = getOptimalDFTSize( img.cols );
-    Mat padded;
-    copyMakeBorder(img, padded, 0, M - img.rows, 0, N - img.cols, BORDER_CONSTANT, Scalar::all(0));
 
 
-    Mat planes[] = {Mat_<float>(padded), Mat::zeros(padded.size(), CV_32F)};
-    Mat complexImg;
-    
-    
-    
-    merge(planes, 2, complexImg);
-    
-    dft(complexImg, complexImg);
-    // complexImg:
-    
-    // 1. Real: mathmatical representation - magnitude
-    // 2. Imaginary: phase range: [0,2pi]
-    
-    // compute log(1 + sqrt(Re(DFT(img))**2 + Im(DFT(img))**2))
-    split(complexImg, planes);
-    
-    Mat ph;
-    phase(planes[0], planes[1], ph);
-    magnitude(planes[0], planes[1], planes[0]);
-    
-    Mat mag = planes[0];
-    mag += Scalar::all(1);
-    log(mag, mag);
-
-//     crop the spectrum, if it has an odd number of rows or columns
-    mag = mag(Rect(0, 0, mag.cols & -2, mag.rows & -2));
-    int cx = mag.cols/2;
-    int cy = mag.rows/2;
-
-//     rearrange the quadrants of Fourier image
-//     so that the origin is at the image center
-    Mat tmp;
-    Mat q0(mag, Rect(0, 0, cx, cy));
-    Mat q1(mag, Rect(cx, 0, cx, cy));
-    Mat q2(mag, Rect(0, cy, cx, cy));
-    Mat q3(mag, Rect(cx, cy, cx, cy));
-
-    q0.copyTo(tmp);
-    q3.copyTo(q0);
-    tmp.copyTo(q3);
-
-    q1.copyTo(tmp);
-    q2.copyTo(q1);
-    tmp.copyTo(q2);
-
-    normalize(mag, mag, 0, 1, NORM_MINMAX);
-
-//    imshow("spectrum magnitude", mag);
-//    imshow("phase", ph);
-//    imshow("original image", padded);
-    return ph;
-}
