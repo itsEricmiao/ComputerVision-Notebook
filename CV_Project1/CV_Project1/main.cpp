@@ -292,8 +292,9 @@ void process_B(){
     
     Mat mat (ph.size(), CV_32FC2);
     Mat mat2 (ph2.size(), CV_32FC2);
+
     
-    // reconstruct mat is not a real image
+    // reconstruct mat is not a real image - in freq domain
     for(int row = 0; row < mat.rows; row++){
         for (int col = 0; col < mat.cols; col++){
             mat.at<Vec2f>(row, col)[0] = mag.at<float>(row, col) * cos(ph2.at<float>(row, col));
@@ -301,7 +302,7 @@ void process_B(){
         }
     }
     
-    //idft function
+    //idft function - spatial domain
     hybrid_image = computeIDFT(mat);
     imshow("Image-1", image1);
     moveWindow("Image-1", 300, 0);

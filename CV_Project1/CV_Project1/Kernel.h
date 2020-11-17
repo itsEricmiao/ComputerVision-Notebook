@@ -65,7 +65,6 @@ Mat getKernel( int n, double sigma, int ktype )
         else
             cd[i] *= sum;
     }
-
     return kernel;
 }
 

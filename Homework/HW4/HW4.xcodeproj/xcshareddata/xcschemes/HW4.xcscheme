@@ -36,7 +36,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/ericmiao/Desktop/School/ComputerVision/ComputerVision/HW4"
+      customWorkingDirectory = "/Users/ericmiao/Desktop/School/ComputerVision/ComputerVision/Homework/HW4"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -54,6 +54,14 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "flowergray.png"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "1.png"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "2.png"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

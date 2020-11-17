@@ -34,7 +34,7 @@ using namespace std;
 int main(int argc, const char ** argv)
 {
     printf("%d", argc);
-    int i = 8;
+    int i = 3;
     
     string filename = argv[i];
     Mat img = imread(samples::findFile(filename), IMREAD_GRAYSCALE);
