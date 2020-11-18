@@ -60,13 +60,13 @@ int main( int argc, char** argv )
  */
 void cornerHarris_demo( int, void* )
 {
-    /// Detector parameters
+    // Detector parameters
     int blockSize = 2;
     int apertureSize = 3;
     double k = 0.04;
     int fpcnt=0;
 
-    /// FEATURE DETECTOR:  Detecting corners
+    // FEATURE DETECTOR:  Detecting corners
     Mat dst = Mat::zeros( src.size(), CV_32FC1 );
     Mat dst_eig = Mat::zeros( src.size(), CV_32FC1 );
     Mat dst_eigvecs = Mat::zeros( src.size(), CV_32FC(6) );
@@ -76,16 +76,15 @@ void cornerHarris_demo( int, void* )
 
     imshow("cornerHarris src_gray", src_gray);
 
-    /// Normalizing
+    // Normalizing
     Mat dst_norm, dst_norm_scaled;
     normalize( dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat() );
     convertScaleAbs( dst_norm, dst_norm_scaled );
 
     imshow("cornerHarris norm  ", dst_norm_scaled);
 
-
     cout << " =========> APPLY THRESHOLD TO CORNERNESS MAP c(H)   " << thresh << endl;
-    /// Drawing a circle around corners
+    // Drawing a circle around corners
     for( int i = 0; i < dst_norm.rows ; i++ )
     {
         for( int j = 0; j < dst_norm.cols; j++ )
@@ -113,10 +112,11 @@ void cornerHarris_demo( int, void* )
         cout << "EigenVectors " << dst_eigvecs.at<Vec6f>(i,j) << endl;
         cout << endl;
 
-        /** TODO:   Print the 15 element feature vector here - using code from last week's breakout **/
+        /* TODO:   Print the 15 element feature vector here - using code from last week's breakout */
         //cout << "FEATURE DESCRIPTOR INFORMATION" << endl;
         //cout << "Feature (5x5) at pnt " << "YOUR CODE" <<  endl;
-
+                
+                
         
             }
         }
