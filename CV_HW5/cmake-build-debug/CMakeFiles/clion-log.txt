@@ -1,5 +1,0 @@
-"/Users/ericmiao/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/193.7288.25/CLion.app/Contents/bin/cmake/mac/bin/cmake" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/ericmiao/Desktop/School/ComputerVision/ComputerVision/CV_HW5
--- Found OpenCV: /usr/local/Cellar/opencv/4.4.0_2 (found version "4.4.0") 
--- Configuring done
--- Generating done
--- Build files have been written to: /Users/ericmiao/Desktop/School/ComputerVision/ComputerVision/CV_HW5/cmake-build-debug
